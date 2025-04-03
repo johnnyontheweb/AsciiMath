@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Runtime.CompilerServices; // added
 
 namespace AsciiMath;
 
@@ -17,7 +18,8 @@ internal class MathMlMarkupBuilder
         _escapeNonAscii = escapeNonAscii;
     }
 
-    protected static bool TryGetSymbol(Symbol symbol, [NotNullWhen(true)] out DisplayDetail? entry, bool fixPhi = true)
+    // protected static bool TryGetSymbol(Symbol symbol, [NotNullWhen(true)] out DisplayDetail? entry, bool fixPhi = true)
+    protected static bool TryGetSymbol(Symbol symbol, out DisplayDetail? entry, bool fixPhi = true)
     {
         // https://github.com/asciidoctor/asciimath/issues/52
         entry = (symbol, fixPhi) switch
@@ -345,7 +347,7 @@ internal class MathMlMarkupBuilder
             {
                 if (index > 0)
                 {
-                    sb.Append(span.Slice(0, index));
+                    sb.Append(span.Slice(0, index).ToString());
                 }
 
                 sb.Append("&quot;");
@@ -359,7 +361,7 @@ internal class MathMlMarkupBuilder
             }
 
             // no more quotes, add the rest
-            sb.Append(span);
+            sb.Append(span.ToString());
         }
     }
 
@@ -596,10 +598,10 @@ internal class MathMlMarkupBuilder
         }
 
         _sb.Append("<mtable>");
-        foreach (var row in node)
+        foreach (MatrixRowNode row in node)
         {
             _sb.Append("<mtr>");
-            foreach (var cell in row)
+            foreach (Node cell in row)
             {
                 _sb.Append("<mtd>");
                 Append(cell);

@@ -6,13 +6,14 @@ namespace AsciiMath;
 
 internal static class StringBuilderExtensions
 {
-    private static readonly SearchValues<char> ValuesToEscape = SearchValues.Create("&<>");
+    //private static readonly SearchValues<char> ValuesToEscape = SearchValues.Create("&<>");
+    private static readonly char[] ValuesToEscape = { '&', '<', '>' }; // Change to char array
 
     public static StringBuilder AppendEscapedText(this StringBuilder sb, ReadOnlyMemory<char> text, bool escapeNonAscii)
     {
         // check for non-ascii and Values to escape
         if (text.Span.IndexOfAny(ValuesToEscape) == -1
-            && (!escapeNonAscii || text.Span.IndexOfAnyExceptInRange((char)0, (char)127) == -1))
+            && (!escapeNonAscii || !ContainsNonAscii(text.Span)))
         {
             // all fine, append everything
             sb.Append(text);
@@ -25,7 +26,8 @@ internal static class StringBuilderExtensions
             if (c == '&')
             {
                 sb.Append("&amp;");
-            }else if (c == '<')
+            }
+            else if (c == '<')
             {
                 sb.Append("&lt;");
             }
@@ -44,5 +46,17 @@ internal static class StringBuilderExtensions
         }
 
         return sb;
+    }
+
+    private static bool ContainsNonAscii(ReadOnlySpan<char> span)
+    {
+        foreach (var c in span)
+        {
+            if (c > 127)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

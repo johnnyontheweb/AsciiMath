@@ -49,8 +49,8 @@ public static class Parser
     /// <returns>The MathML string, or <see cref="string.Empty"/> if the string cannot be parsed</returns>
     public static string ToMathMl(string asciiMath, MathMlOptions options)
     {
-        ArgumentNullException.ThrowIfNull(asciiMath);
-        ArgumentNullException.ThrowIfNull(options);
+        if (asciiMath == null) throw new ArgumentNullException(nameof(asciiMath));
+        if (options == null) throw new ArgumentNullException(nameof(options));
 
         if (ExpressionParser.Parse(asciiMath) is not { } node)
         {

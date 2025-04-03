@@ -320,7 +320,7 @@ internal static class ExpressionParser
             (null, null) => throw new InvalidOperationException("Cannot concat two null expressions"),
         };
 
-    [return: NotNullIfNotNull(nameof(node))]
+    //[return: NotNullIfNotNull(nameof(node))]
     private static Node? TryUnwrapParen(Node? node)
         => node is ParenNode paren
            && (paren.LParen is null || paren.LParen.Type == TokenType.LeftParen)

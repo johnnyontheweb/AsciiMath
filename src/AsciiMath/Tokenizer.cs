@@ -24,7 +24,8 @@ namespace AsciiMath;
 /// </remarks>
 internal class Tokenizer(string input)
 {
-    private static readonly SearchValues<char> Numbers = SearchValues.Create("0123456789");
+    //private static readonly SearchValues<char> Numbers = SearchValues.Create("0123456789");
+    private static readonly char[] Numbers = "0123456789".ToCharArray(); // Change to char array
 
     private ReadOnlyMemory<char> _span = input.AsMemory();
     private Token? _pushedBack;
@@ -103,13 +104,25 @@ internal class Tokenizer(string input)
 
         return new Token(TokenType.Text, span);
     }
-        
+
+    private int IndexOfAnyExcept(ReadOnlySpan<char> span, char[] values)
+    {
+        for (int i = 0; i < span.Length; i++)
+        {
+            if (Array.IndexOf(values, span[i]) == -1)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private Token? ReadNumber()
     {
         Debug.Assert(_span.Span.IndexOfAny(Numbers) == 0);
         ReadOnlyMemory<char> span;
 
-        var indexOfFirstNonNumber = _span.Span.IndexOfAnyExcept(Numbers);
+        var indexOfFirstNonNumber = IndexOfAnyExcept(_span.Span, Numbers);
         if (indexOfFirstNonNumber < 0)
         {
             // everything is a number
@@ -128,7 +141,7 @@ internal class Tokenizer(string input)
         }
 
         // we have a decimal, check for numbers
-        var indexofSecondNonNumber = _span.Slice(indexOfFirstNonNumber + 1).Span.IndexOfAnyExcept(Numbers);
+        var indexofSecondNonNumber = IndexOfAnyExcept(_span.Slice(indexOfFirstNonNumber + 1).Span, Numbers);
         if (indexofSecondNonNumber == 0)
         {
             // first character after '.' was not a number, so ignore the dot

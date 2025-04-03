@@ -1,13 +1,15 @@
-﻿using System.Collections.Frozen;
+﻿//using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace AsciiMath;
 
 internal class SymbolTable
 {
-    public static bool TryGetEntry(ReadOnlySpan<char> text, [NotNullWhen(true)]out SymbolDetail? entry)
+    // public static bool TryGetEntry(ReadOnlySpan<char> text, [NotNullWhen(true)]out SymbolDetail? entry)
+    public static bool TryGetEntry(ReadOnlySpan<char> text, out SymbolDetail? entry)
     {
         // Probably would rather a dictionary here, but would need to convert the text to a string so meh
         // can almost certainly optimise this further, but again, meh
@@ -299,7 +301,8 @@ internal class SymbolTable
         return entry is not null;
     }
 
-    public static readonly Lazy<FrozenDictionary<string, SymbolDetail>> AllSymbols = new (() => new Dictionary<string, SymbolDetail>()
+    //public static readonly Lazy<FrozenDictionary<string, SymbolDetail>> AllSymbols = new (() => new Dictionary<string, SymbolDetail>()
+    public static readonly Lazy<Dictionary<string, SymbolDetail>> AllSymbols = new(() => new Dictionary<string, SymbolDetail>()
     {
         // Operation symbols
         { "+", new(Symbol.plus, TokenType.Symbol) },
@@ -682,12 +685,12 @@ internal class SymbolTable
         { "Psi", new(Symbol.Psi, TokenType.Symbol) },
         { "omega", new(Symbol.omega, TokenType.Symbol) },
         { "Omega", new(Symbol.Omega, TokenType.Symbol) },
-    }.ToFrozenDictionary());
+    }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
 
     public const int MaxKeyLength = 21;
 
 
-    private static (int r, int g, int b)? TryGetColor(ReadOnlySpan<char> text)
+    private static (int r, int g, int b)? TryGetColor(string text)
     {
         if (text.Equals("aqua", StringComparison.OrdinalIgnoreCase))
             return (0, 255, 255);
@@ -724,6 +727,13 @@ internal class SymbolTable
         return null;
     }
 
+    public static bool IsAsciiHexDigit(char c)
+    {
+        return (c >= '0' && c <= '9') ||
+               (c >= 'A' && c <= 'F') ||
+               (c >= 'a' && c <= 'f');
+    }
+
     private static Node ConvertToColor(Node node)
     {
         // set the capacity to be large enough that everything fits
@@ -736,42 +746,38 @@ internal class SymbolTable
         int b; 
         if (sb.Length == 4)
         {
-            foreach (var chunk in sb.GetChunks())
+            var chunk = sb.ToString();
+            if (chunk[0] == '#'
+                && IsAsciiHexDigit(chunk[1])
+                && IsAsciiHexDigit(chunk[2])
+                && IsAsciiHexDigit(chunk[3]))
             {
-                if(chunk.Span[0] == '#'
-                   && char.IsAsciiHexDigit(chunk.Span[1])
-                   && char.IsAsciiHexDigit(chunk.Span[2])
-                   && char.IsAsciiHexDigit(chunk.Span[3]))
-                {
-                    var c = int.Parse(chunk.Span.Slice(1, 1), NumberStyles.HexNumber);
-                    r = (c << 4) + c;
-                    c = int.Parse(chunk.Span.Slice(2, 1), NumberStyles.HexNumber);
-                    g = (c << 4) + c;
-                    c = int.Parse(chunk.Span.Slice(3, 1), NumberStyles.HexNumber);
-                    b = (c << 4) + c;
+                var c = int.Parse(chunk.Substring(1, 1), NumberStyles.HexNumber);
+                r = (c << 4) + c;
+                c = int.Parse(chunk.Substring(2, 1), NumberStyles.HexNumber);
+                g = (c << 4) + c;
+                c = int.Parse(chunk.Substring(3, 1), NumberStyles.HexNumber);
+                b = (c << 4) + c;
 
-                    return new ColorNode(sb.ToString(), r, g, b);
-                }
+                return new ColorNode(sb.ToString(), r, g, b);
             }
         }
         else if (sb.Length == 7)
         {
-            foreach (var chunk in sb.GetChunks())
+            var chunk = sb.ToString();
+            if (chunk[0] == '#'
+                && IsAsciiHexDigit(chunk[1])
+                && IsAsciiHexDigit(chunk[2])
+                && IsAsciiHexDigit(chunk[3])
+                && IsAsciiHexDigit(chunk[4])
+                && IsAsciiHexDigit(chunk[5])
+                && IsAsciiHexDigit(chunk[6]))
             {
-                if(chunk.Span[0] == '#'
-                   && char.IsAsciiHexDigit(chunk.Span[1])
-                   && char.IsAsciiHexDigit(chunk.Span[2])
-                   && char.IsAsciiHexDigit(chunk.Span[3])
-                   && char.IsAsciiHexDigit(chunk.Span[4])
-                   && char.IsAsciiHexDigit(chunk.Span[5])
-                   && char.IsAsciiHexDigit(chunk.Span[6]))
-                {
-                    r = int.Parse(chunk.Span.Slice(1, 2), NumberStyles.HexNumber);
-                    g = int.Parse(chunk.Span.Slice(3, 2), NumberStyles.HexNumber);
-                    b = int.Parse(chunk.Span.Slice(5, 2), NumberStyles.HexNumber);
+                r = int.Parse(chunk.Substring(1, 2), NumberStyles.HexNumber);
+                g = int.Parse(chunk.Substring(3, 2), NumberStyles.HexNumber);
+                b = int.Parse(chunk.Substring(5, 2), NumberStyles.HexNumber);
 
-                    return new ColorNode(sb.ToString(), r, g, b);
-                }
+                return new ColorNode(sb.ToString(), r, g, b);
             }
         }
 

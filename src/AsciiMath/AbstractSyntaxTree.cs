@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AsciiMath;
@@ -124,7 +125,7 @@ internal class SymbolNode(Symbol? symbol, ReadOnlyMemory<char> text, TokenType t
         return HashCode.Combine((int?)Value, Text, (int)Type);
     }
 
-    [return: NotNullIfNotNull(nameof(token))]
+    // [return: NotNullIfNotNull(nameof(token))]
     public static SymbolNode? From(Token? token)
     {
         if (token is null)
@@ -301,7 +302,8 @@ internal class MatrixNode : InnerNode
 
     public SymbolNode? RParen { get; }
 
-    public override IEnumerator<MatrixRowNode> GetEnumerator() => Children.Cast<MatrixRowNode>().GetEnumerator();
+    //public override IEnumerator<MatrixRowNode> GetEnumerator() => Children.Cast<MatrixRowNode>().GetEnumerator();
+    public override IEnumerator<Node> GetEnumerator() => Children.GetEnumerator();
 
     public override string ToString() =>
         $"{(LParen is null ? "{:" : LParen)}{string.Join(",", Children)}{(RParen is null ? ":}" : RParen)}";
