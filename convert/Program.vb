@@ -10,6 +10,8 @@ Module Program
 conv:   Console.WriteLine("Input formula:")
         Dim form = Console.ReadLine()
         Dim out As String = Parser.ToMathMl(form)
+        ' Aggiungi il namespace
+        out = AddNamespace(out, "http://www.w3.org/1998/Math/MathML")
         Console.WriteLine("Converted MathML:")
         Console.WriteLine(out)
         Console.WriteLine("Converted OMML:")
@@ -21,6 +23,24 @@ conv:   Console.WriteLine("Input formula:")
         If key = ConsoleKey.Y Then GoTo conv
         Exit Sub
     End Sub
+
+    ' Funzione per aggiungere il namespace
+    Public Function AddNamespace(xml As String, namespaceUri As String) As String
+        Dim doc As New XmlDocument()
+        doc.LoadXml(xml)
+        Dim root As XmlElement = doc.DocumentElement
+        If root IsNot Nothing AndAlso Not root.HasAttribute("xmlns") Then
+            root.SetAttribute("xmlns", namespaceUri)
+        End If
+        Using stringWriter As New StringWriter()
+            Using xmlTextWriter As XmlTextWriter = New XmlTextWriter(stringWriter)
+                xmlTextWriter.Formatting = Formatting.Indented
+                doc.WriteTo(xmlTextWriter)
+                xmlTextWriter.Flush()
+                Return stringWriter.GetStringBuilder().ToString()
+            End Using
+        End Using
+    End Function
 
     ' conversione in OMML
     Public Function ConvertMathMLtoOMML(MMLtext As String) As String
