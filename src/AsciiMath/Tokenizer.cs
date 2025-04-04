@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Diagnostics;
 
 namespace AsciiMath;
@@ -56,7 +57,7 @@ internal class Tokenizer(string input)
         return _span.Span[0] switch
         {
             '"' => ReadQuotedText(),
-            't' when _span.Span.Slice(0, 5) is "text(" => ReadTexText(),
+            't' when _span.Span.Length >= 5 && _span.Span.Slice(0, 5) is "text(" => ReadTexText(),
             '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9' => ReadNumber() ?? ReadSymbol(),
             _ => ReadSymbol(),
         };
