@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>convert</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
