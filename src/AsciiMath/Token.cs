@@ -25,6 +25,7 @@ internal enum TokenType
     Unary,
     Binary,
     Infix,
+    Delimiter,
     LeftParen,
     RightParen,
     LeftRightParen,

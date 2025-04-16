@@ -295,6 +295,10 @@ internal class SymbolTable
             "Psi" => new(Symbol.Psi, TokenType.Symbol),
             "omega" => new(Symbol.omega, TokenType.Symbol),
             "Omega" => new(Symbol.Omega, TokenType.Symbol),
+
+        // Delimiter
+            "$$" => new(Symbol.dubDollar, TokenType.Delimiter),
+
             _ => null,
         };
 
@@ -685,6 +689,9 @@ internal class SymbolTable
         { "Psi", new(Symbol.Psi, TokenType.Symbol) },
         { "omega", new(Symbol.omega, TokenType.Symbol) },
         { "Omega", new(Symbol.Omega, TokenType.Symbol) },
+
+        // Delimiter
+        { "$$", new(Symbol.dubDollar, TokenType.Delimiter) },
     }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
 
     public const int MaxKeyLength = 21;

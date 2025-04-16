@@ -278,4 +278,7 @@ internal enum Symbol
     Psi,
     omega,
     Omega,
+
+    // Delimiter
+    dubDollar,
 }

@@ -8,20 +8,20 @@ Module Program
     Sub Main(args As String())
         Console.WriteLine("AsciiMath converter")
 conv:   Console.WriteLine("Input formula:")
-        Dim form = Console.ReadLine()
+        Dim form = "f_$$ck$$*f_ck" 'Console.ReadLine()
         Dim out As String = Parser.ToMathMl(form)
         ' Aggiungi il namespace
         out = AddNamespace(out, "http://www.w3.org/1998/Math/MathML")
         Console.WriteLine("Converted MathML:")
         Console.WriteLine(out)
-        Console.WriteLine("Converted OMML:")
-        Console.WriteLine(ConvertMathMLtoOMML(out))
-        ' loop
-        Console.WriteLine("")
-        Console.WriteLine("Convert another one? (y/n)")
-        Dim key = Console.ReadKey(True).Key
-        If key = ConsoleKey.Y Then GoTo conv
-        Exit Sub
+        'Console.WriteLine("Converted OMML:")
+        'Console.WriteLine(ConvertMathMLtoOMML(out))
+        '' loop
+        'Console.WriteLine("")
+        'Console.WriteLine("Convert another one? (y/n)")
+        'Dim key = Console.ReadKey(True).Key
+        'If key = ConsoleKey.Y Then GoTo conv
+        'Exit Sub
     End Sub
 
     ' Funzione per aggiungere il namespace

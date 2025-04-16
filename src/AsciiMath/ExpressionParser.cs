@@ -96,6 +96,7 @@ internal static class ExpressionParser
         var token1 = tokenizer.GetNext();
         return token1.Type switch
         {
+            TokenType.Delimiter => HandleDelimiter(tokenizer, token1),
             TokenType.LeftParen => HandleLeftParen(tokenizer, token1),
             TokenType.LeftRightParen => HandleLeftParen(tokenizer, token1),
             TokenType.RightParen => HandleRightParen(tokenizer, closeParenType, token1),
@@ -107,6 +108,22 @@ internal static class ExpressionParser
             TokenType.Identifier => new IdentifierNode(token1.Text),
             _ => SymbolNode.From(token1),
         };
+
+        static Node HandleDelimiter(Tokenizer tokenizer, Token token1)
+        {
+            var closeWith = TokenType.Delimiter;
+
+            var token2 = tokenizer.GetNext();
+            if (token2.Type == closeWith)
+            {
+                return new EmptyNode();
+            }
+
+            tokenizer.PushBack(token2);
+
+            var expression = ParseExpression(tokenizer, closeWith);
+            return expression?? new EmptyNode();
+        }
 
         static Node HandleLeftParen(Tokenizer tokenizer, Token token1)
         {
